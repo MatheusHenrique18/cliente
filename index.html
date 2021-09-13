@@ -26,24 +26,56 @@
 
 <body ng-app="cadastroCliente" ng-controller="clienteController">
 
-  <nav class="navbar navbar-default">
+  <nav class="navbar navbar-default" ng-show="usuarioLogado.isLogado">
     <div class="container-fluid">
   
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-          <li><a href="index.html"><b>Crud de Clientes</b></a></li>
+          <li><br><b ng-show="usuarioLogado.isLogado">Logado como: Usuário {{usuarioLogado.perfil}}</b></li>
         </ul>
       </div>
     </div>
   </nav>
-  
-  <div class="container" style="margin-top: 50px;">
+
+  <div class="container" style="margin-top: 300px;" ng-show="!usuarioLogado.isLogado">
+    <div style="text-align: center;" >
+      <div class="panel panel-default">
+        <div class="panel-body">
+
+          <h2>Login</h2>
+          <div class="form-group row">
+            <div class="col-sm-2">
+            </div>
+            <label for="usuario" class="col-sm-2 col-form-label">Usuário</label>
+            <div class="col-sm-5">
+              <input type="text" id="usuario" class="form-control" ng-model="usuario.nome" placeholder="Usuário">
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-2">
+            </div>
+            <label for="senha" class="col-sm-2 col-form-label">Senha</label>
+            <div class="col-sm-5">
+              <input type="password" id="senha" class="form-control" ng-model="usuario.senha" placeholder="Senha">
+            </div>
+          </div>
+
+          <button class="btn btn-primary" ng-click="logar(usuario)">Entrar</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="container" style="margin-top: 50px;" ng-show="usuarioLogado.isLogado">
     
-    <h2 ng-bind="app"></h2>
+    <button class="btn btn-info" ng-click="logout()" style="float: right;">Logout</button>
+
+    <h2 ng-bind="app" ng-show="usuarioLogado.perfil === 'ADMIN'"></h2>
     
     <!-- AQUI COMEÇA MENSAGENS DE SUCESSO E ERRO -->
-    <hr>
+    <hr ng-show="usuarioLogado.perfil === 'ADMIN'">
     <div class="alert alert-danger" role="alert" ng-if="mensagemErro">
       <a href="#" class="close" ng-click="clearMessages()">&times;</a>
       {{mensagemErro}}
@@ -56,11 +88,11 @@
 
 
     <!-- AQUI COMEÇA O CADASTRO DE CLIENTES -->
-    <div class="panel panel-default">
+    <div class="panel panel-default" ng-show="usuarioLogado.perfil === 'ADMIN'">
       <div class="panel-body">
         
         <form name="clienteForm">
-          <div class="form-group row" ng-if="cliente.id">
+          <div class="form-group row" ng-show="cliente.id">
             <label for="inputEmail3" class="col-sm-2 col-form-label">ID</label>
             <div class="col-sm-10">
               <input type="text" class="form-control" ng-model="cliente.id" placeholder="Código" disabled>
@@ -202,7 +234,7 @@
     </div>
     <!-- AQUI TERMINA O CADASTRO DE CLIENTES -->
 
-    <hr>
+    <hr ng-show="usuarioLogado.perfil === 'ADMIN'">
     
     <!-- AQUI COMEÇA A LISTAGEM DE CLIENTES -->
     <br>
@@ -308,8 +340,8 @@
   
         <br>
         <hr>
-        <button class="btn btn-danger" ng-click="excluirCliente(clienteL.id)">Excluir</button>
-        <button class="btn btn-primary" ng-click="editarCliente(clienteL.id)">Editar</button>
+        <button class="btn btn-danger" ng-click="excluirCliente(clienteL.id)" ng-disabled="usuarioLogado.perfil !== 'ADMIN'">Excluir</button>
+        <button class="btn btn-primary" ng-click="editarCliente(clienteL.id)" ng-disabled="usuarioLogado.perfil !== 'ADMIN'">Editar</button>
   
         <br>
           

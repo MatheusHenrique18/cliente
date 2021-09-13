@@ -23,6 +23,10 @@ cadastroCliente.factory("clienteAPI", function($http){
     var _getEndereco = function(cep){
         return $http.get("https://viacep.com.br/ws/"+cep+"/json");
     };
+
+    var _logar = function(){
+        return $http.get("http://localhost:8080/api/usuario");
+    };
     
 
     return{
@@ -30,6 +34,8 @@ cadastroCliente.factory("clienteAPI", function($http){
         getClienteById: _getClienteById,
         saveCliente: _saveCliente,
         deleteCliente: _deleteCliente,
-        getEndereco: _getEndereco
+        getEndereco: _getEndereco,
+        logar: _logar
+
     };
 });

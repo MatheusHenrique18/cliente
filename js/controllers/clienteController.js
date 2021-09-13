@@ -1,4 +1,4 @@
-var cadastroCliente = angular.module("cadastroCliente", []);
+var cadastroCliente = angular.module("cadastroCliente", ["ngMessages"]);
 cadastroCliente.directive("phoneDir", PhoneDir);
 cadastroCliente.filter("cepFilter", cepFilter);
 cadastroCliente.filter("telFilter", telFilter);
@@ -12,6 +12,9 @@ cadastroCliente.controller("clienteController", function($scope, $http, clienteA
     $scope.cliente = {
     };
 
+    $scope.usuario = {};
+    $scope.usuarioLogado = {"isLogado": false};
+
     $scope.objInvalido = {};
 
     $scope.email = {};
@@ -19,16 +22,6 @@ cadastroCliente.controller("clienteController", function($scope, $http, clienteA
 
     $scope.telefone = {};
     $scope.listaTelefonesAdicionados = [];
-
-
-
-
-    console.log("***funcionando");
-    
-    $scope.teste = "sucesso";
-    
-    //apenas para indicar id do novo registro a ser criado pelo usuário
-    $scope.sequenceID = 0;
 
     function listarClientes(){
         clienteAPI.getClientes().then(function(response){
@@ -199,6 +192,7 @@ cadastroCliente.controller("clienteController", function($scope, $http, clienteA
         $scope.cliente = {};
         $scope.listaTelefonesAdicionados = [];
         $scope.listaEmailsAdicionados = [];
+
         $scope.clienteForm.$setUntouched();
     }
 
@@ -222,6 +216,12 @@ cadastroCliente.controller("clienteController", function($scope, $http, clienteA
             $scope.listaTelefonesAdicionados = clienteRecuperado.listaTelefone;
             $scope.cliente = clienteRecuperado;
 
+            var cpf = $scope.cliente.cpf;
+            $scope.cliente.cpf = cpf.substring(0,3) + "." + cpf.substring(3,6) + "." + cpf.substring(6,9) + "-" + cpf.substring(9);
+
+            var cep = $scope.cliente.cep;
+            $scope.cliente.cep = cep.substring(0,5) + "-" + cep.substring(5);
+
             // INCLUINDO MASCARA DE TELEFONE AO RECUPERAR CLIENTE PELO ID
             $scope.cliente.listaTelefone.forEach(telefone => {
                 telefone.numero = inserirMascaraTelefoneListagem(telefone.numero);
@@ -233,6 +233,39 @@ cadastroCliente.controller("clienteController", function($scope, $http, clienteA
             error = "não foi possível encontrar o cliente";
             console.log(error);
         });
+    }
+
+    $scope.logar = function(usuario){
+        clienteAPI.logar().then(function(response){
+            var usuariosCadastrados =  response.data
+
+            console.log("***usuario", usuario);
+            console.log("***usuarios", usuariosCadastrados);
+            
+            usuariosCadastrados.forEach(usuarioCad => {
+                if(usuarioCad.nome === usuario.nome && usuarioCad.senha === usuario.senha){
+                    $scope.usuarioLogado.isLogado = true;
+                    $scope.usuarioLogado.perfil = usuarioCad.perfil;
+                }
+            });
+
+            if($scope.usuarioLogado.isLogado === false){
+                alert("Usuário ou Senha incorretos");
+            }
+
+            console.log("***UsuarioLogado", $scope.usuarioLogado);
+            // INCLUINDO MASCARA DE TELEFONE AO RECUPERAR CLIENTE PELO ID
+
+        },function(error){
+            error = "não foi possível autenticar o usuario";
+            console.log(error);
+        });
+    }
+
+    $scope.logout = function(){
+        $scope.usuario = {};
+        $scope.usuarioLogado = {"isLogado": false, perfil: ""};
+        console.log("***logout", $scope.usuarioLogado);
     }
 
 });
