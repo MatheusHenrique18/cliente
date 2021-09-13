@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Crud de Clientes</title>
+
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/css/font-awesome.min.css">
+
+  <!-- Style -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Angular -->
+  <script type="text/javascript" src="js/angular.min.js"></script>
+  <script type="text/javascript" src="js/angular-messages.js"></script>
+
+  <!-- Controller -->
+  <script type="text/javascript" src="js/controllers/clienteController.js"></script>
+  <script type="text/javascript" src="js/services/clienteAPIService.js"></script>
+
+</head>
+
+<body ng-app="cadastroCliente" ng-controller="clienteController">
+
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+  
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="index.html"><b>Crud de Clientes</b></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container" style="margin-top: 50px;">
+    
+    <h2 ng-bind="app"></h2>
+    
+    <!-- AQUI COMEÇA MENSAGENS DE SUCESSO E ERRO -->
+    <hr>
+    <div class="alert alert-danger" role="alert" ng-if="mensagemErro">
+      <a href="#" class="close" ng-click="clearMessages()">&times;</a>
+      {{mensagemErro}}
+    </div>
+    <div class="alert alert-success" role="alert" ng-if="mensagemSucesso">
+      <a href="#" class="close" ng-click="clearMessages()">&times;</a>
+      {{mensagemSucesso}}
+    </div>
+    <!-- AQUI TERMINA MENSAGENS DE SUCESSO E ERRO -->
+
+
+    <!-- AQUI COMEÇA O CADASTRO DE CLIENTES -->
+    <div class="panel panel-default">
+      <div class="panel-body">
+        
+        <form name="clienteForm">
+          <div class="form-group row" ng-if="cliente.id">
+            <label for="inputEmail3" class="col-sm-2 col-form-label">ID</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" ng-model="cliente.id" placeholder="Código" disabled>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="nome" class="col-sm-2 col-form-label">Nome</label>
+            <div class="col-sm-10">
+              <input type="text" id="nome" name="nome" class="form-control" ng-model="cliente.nome" placeholder="Nome" ng-required="true" ng-minlength="3" ng-maxlength="100">
+                <span class="erro" ng-show="clienteForm.nome.$touched && clienteForm.nome.$error.required">Campo Nome é obrigatório.</span>
+                <span class="erro" ng-show="clienteForm.nome.$touched && clienteForm.nome.$error.minlength">Mínimo de 3 caracteres.</span>
+                <span class="erro" ng-show="clienteForm.nome.$touched && clienteForm.nome.$error.maxlength">Máximo de 100 caracteres.</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="cpf" class="col-sm-2 col-form-label">CPF</label>
+            <div class="col-sm-5">
+              <input type="text" id="cpf" name="cpf" class="form-control" data-mask="999.999.999-99" ng-model="cliente.cpf" placeholder="CPF" ng-required="true">
+              <span class="erro" ng-show="clienteForm.cpf.$touched && clienteForm.cpf.$error.required">Campo CPF é obrigatório.</span>
+            </div>
+            <label for="cep" class="col-sm-1 col-form-label">CEP</label>
+            <div class="col-sm-4">
+              <input type="text" id="cep" name="cep" class="form-control" data-mask="00000-000" ng-model="cliente.cep" placeholder="CEP" ng-blur="buscarCep(cliente.cep)" ng-required="true">
+              <span class="erro" ng-show="clienteForm.cep.$touched && clienteForm.cep.$error.required">Campo CEP é obrigatório.</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="logradouro" class="col-sm-2 col-form-label">Logradouro</label>
+            <div class="col-sm-10">
+              <input type="text" id="logradouro" name="logradouro" class="form-control" ng-model="cliente.logradouro" placeholder="Logradouro" ng-required="true">
+              <span class="erro" ng-show="clienteForm.logradouro.$touched && clienteForm.logradouro.$error.required">Campo Logradouro é obrigatório.</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="bairro" class="col-sm-2 col-form-label">Bairro</label>
+            <div class="col-sm-10">
+              <input type="text" id="bairro" name="bairro" class="form-control" ng-model="cliente.bairro" placeholder="Bairro" ng-required="true">
+              <span class="erro" ng-show="clienteForm.bairro.$touched && clienteForm.bairro.$error.required">Campo Bairro é obrigatório.</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="cidade" class="col-sm-2 col-form-label">Cidade</label>
+            <div class="col-sm-5">
+              <input type="text" id="cidade" name="cidade" class="form-control" ng-model="cliente.cidade" placeholder="Cidade" ng-required="true">
+              <span class="erro" ng-show="clienteForm.cidade.$touched && clienteForm.cidade.$error.required">Campo Cidade é obrigatório.</span>
+            </div>
+            <label for="uf" class="col-sm-1 col-form-label">UF</label>
+            <div class="col-sm-4">
+              <input type="text" id="uf" name="uf" class="form-control" ng-model="cliente.uf" placeholder="UF" ng-required="true">
+              <span class="erro" ng-show="clienteForm.uf.$touched && clienteForm.uf.$error.required">Campo UF é obrigatório.</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="complemento" class="col-sm-2 col-form-label">Complemento</label>
+            <div class="col-sm-10">
+              <input type="text" id="complemento" class="form-control" ng-model="cliente.complemento" placeholder="Complemento">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="numero" class="col-sm-2 col-form-label">Telefone</label>
+            <div class="col-sm-4">
+              <select class="form-control"ng-model="telefone.tipo">
+                <option value="" selected disabled hidden>--Selecione o Tipo--</option>
+                <option value="Celular">Celular</option>
+                <option value="Residencial">Residencial</option>
+                <option value="Comercial">Comercial</option>
+              </select>
+            </div>
+            <div class="col-sm-5">
+              <input type="text"  id="numero" class="form-control" ng-model="telefone.numero" placeholder="Número" phone-dir>
+            </div>
+            <div class="col-sm-1">
+              <button class="btn btn-success" ng-click="adicionarTelefone(telefone)">Add</button>
+            </div>
+          </div>
+    
+          <hr>
+          <div class="form-group row">
+            <label for="inputPassword3" class="col-sm-2 col-form-label">Lista de Telefones</label>
+            <div class="col-sm-5">
+              <table class="table table-striped" >
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Número</th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="telefoneAdicionado in listaTelefonesAdicionados track by $index">
+                    <td>{{telefoneAdicionado.tipo}}</td>
+                    <td>{{telefoneAdicionado.numero}}</td>
+                    <td style="text-align: right;"><button class="btn btn-danger" ng-click="removerTelefone(telefoneAdicionado)">Remover</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <hr>
+    
+          <div class="form-group row">
+            <label for="email" class="col-sm-2 col-form-label">Email</label>
+            <div class="col-sm-9">
+              <input type="text" id="email" class="form-control" ng-model="email.email" placeholder="Email">
+            </div>
+            <div class="col-sm-1">
+              <button class="btn btn-success" ng-click="adicionarEmail(email)">Add</button>
+            </div>
+          </div>
+    
+          <hr>
+          <div class="form-group row">
+            <label for="inputPassword3" class="col-sm-2 col-form-label">Lista de Emails</label>
+            <div class="col-sm-10">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>&nbsp;</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="emailAdicionado in listaEmailsAdicionados track by $index">
+                    <td>{{emailAdicionado.email}}</td>
+                    <td style="text-align: right;"><button class="btn btn-danger" ng-click="removerEmail(emailAdicionado)">Remover</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <hr>
+    
+        </form>
+    
+        <button type="button" class="btn btn-primary" ng-click="salvarCliente(cliente)" ng-disabled="clienteForm.$invalid">Salvar</button>
+        <button type="button" class="btn btn-info" ng-click="limparCampos()">Limpar</button>
+
+      </div>
+    </div>
+    <!-- AQUI TERMINA O CADASTRO DE CLIENTES -->
+
+    <hr>
+    
+    <!-- AQUI COMEÇA A LISTAGEM DE CLIENTES -->
+    <br>
+    <h2>Listagem de Clientes</h2>
+    <br>
+    
+    <input type="text" class="form-control" placeholder="Buscar Cliente" ng-model="criterioBusca">
+    <br>
+
+    <div class="form-group row" ng-repeat="clienteL in listaClientes | filter:criterioBusca">
+
+      <div class="panel panel-default">
+        <div class="panel-body">
+          
+          <br>
+        <div class="form-group row">
+          <label for="inputEmail3" class="col-sm-2 col-form-label">ID</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="clienteL.id" placeholder="Código" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="nome" class="col-sm-2 col-form-label">Nome</label>
+          <div class="col-sm-10">
+            <input type="text" id="nome" name="nome" class="form-control" ng-model="clienteL.nome" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="cpf" class="col-sm-2 col-form-label">CPF</label>
+          <div class="col-sm-5">
+            <!-- <input type="text" id="cpf" name="cpf" class="form-control" data-mask="999.999.999-99" ng-model="clienteL.cpf" disabled> -->
+            {{ clienteL.cpf | cpfFilter}}
+          </div>
+          <label for="cep" class="col-sm-1 col-form-label">CEP</label>
+          <div class="col-sm-4">
+            <!-- <input type="text" id="cep" name="cep" class="form-control" data-mask="00000-000" ng-model="clienteL.cep | cepFilter" disabled> -->
+            {{clienteL.cep | cepFilter}}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="logradouro" class="col-sm-2 col-form-label">Logradouro</label>
+          <div class="col-sm-10">
+            <input type="text" id="logradouro" name="logradouro" class="form-control" ng-model="clienteL.logradouro" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="bairro" class="col-sm-2 col-form-label">Bairro</label>
+          <div class="col-sm-10">
+            <input type="text" id="bairro" name="bairro" class="form-control" ng-model="clienteL.bairro" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="cidade" class="col-sm-2 col-form-label">Cidade</label>
+          <div class="col-sm-5">
+            <input type="text" id="cidade" name="cidade" class="form-control" ng-model="clienteL.cidade" disabled>
+          </div>
+          <label for="uf" class="col-sm-1 col-form-label">UF</label>
+          <div class="col-sm-4">
+            <input type="text" id="uf" name="uf" class="form-control" ng-model="clienteL.uf" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="complemento" class="col-sm-2 col-form-label">Complemento</label>
+          <div class="col-sm-10">
+            <input type="text" id="complemento" class="form-control" ng-model="clienteL.complemento" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputPassword3" class="col-sm-2 col-form-label">Lista de Telefones</label>
+          <div class="col-sm-4">
+            <table class="table table-striped" >
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Número</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="telefoneCliL in clienteL.listaTelefone track by $index">
+                  <td>{{telefoneCliL.tipo}}</td>
+                  <td>{{telefoneCliL.numero || telFilter}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+          <label for="inputPassword3" class="col-sm-2 col-form-label" style="text-align: right;">Lista de Emails</label>
+          <div class="col-sm-4">
+            <table class="table table-striped" >
+              <thead>
+                <tr>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="emailCliL in clienteL.listaEmail track by $index">
+                  <td>{{emailCliL.email}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  
+        <br>
+        <hr>
+        <button class="btn btn-danger" ng-click="excluirCliente(clienteL.id)">Excluir</button>
+        <button class="btn btn-primary" ng-click="editarCliente(clienteL.id)">Editar</button>
+  
+        <br>
+          
+        </div>
+      </div>
+      
+    </div>  
+    <!-- AQUI TERMINA A LISTAGEM DE CLIENTES -->
+
+
+  </div>
+
+  <script>
+    document.getElementById("nome").onkeypress = function(e) {
+         var chr = String.fromCharCode(e.which);
+         if ("1234567890qwertyuiopçlkjhgfdsazxcvbnmQWERTYUIOPÇLKJHGFDSAZXCVBNM".indexOf(chr) < 0)
+           return false;
+       };
+  </script>
+
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.mask.js"></script>
+</body>
+
+</html>
