@@ -44,24 +44,26 @@
         <div class="panel-body">
 
           <h2>Login</h2>
-          <div class="form-group row">
-            <div class="col-sm-2">
+          <form name="formLogin">
+            <div class="form-group row">
+              <div class="col-sm-2">
+              </div>
+              <label for="usuario" class="col-sm-2 col-form-label">Usuário</label>
+              <div class="col-sm-5">
+                <input type="text" id="usuario" class="form-control" ng-model="usuario.nome" placeholder="Usuário" required="true">
+              </div>
             </div>
-            <label for="usuario" class="col-sm-2 col-form-label">Usuário</label>
-            <div class="col-sm-5">
-              <input type="text" id="usuario" class="form-control" ng-model="usuario.nome" placeholder="Usuário">
+            <div class="form-group row">
+              <div class="col-sm-2">
+              </div>
+              <label for="senha" class="col-sm-2 col-form-label">Senha</label>
+              <div class="col-sm-5">
+                <input type="password" id="senha" class="form-control" ng-model="usuario.senha" placeholder="Senha" required="true">
+              </div>
             </div>
-          </div>
-          <div class="form-group row">
-            <div class="col-sm-2">
-            </div>
-            <label for="senha" class="col-sm-2 col-form-label">Senha</label>
-            <div class="col-sm-5">
-              <input type="password" id="senha" class="form-control" ng-model="usuario.senha" placeholder="Senha">
-            </div>
-          </div>
+          </form>
 
-          <button class="btn btn-primary" ng-click="logar(usuario)">Entrar</button>
+          <button class="btn btn-primary" ng-click="logar(usuario)" ng-disabled="formLogin.$invalid">Entrar</button>
         </div>
       </div>
       
